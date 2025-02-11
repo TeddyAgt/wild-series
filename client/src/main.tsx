@@ -13,7 +13,7 @@ import Programs from "./pages/Programs";
 // import About from "./pages/About";
 // import Contact from "./pages/Contact";
 
-export type Course = {
+export type Program = {
   id: number;
   title: string;
   synopsis: string;
@@ -21,6 +21,7 @@ export type Course = {
   country: string;
   year: number;
 };
+
 /* ************************************************************************* */
 
 // Create router configuration with routes
@@ -33,7 +34,7 @@ const router = createBrowserRouter([
   {
     path: "/programs",
     element: <Programs />,
-    loader: async (): Promise<Course[] | undefined> => {
+    loader: async (): Promise<Program[] | undefined> => {
       try {
         const response = await fetch("http://localhost:3310/api/programs");
 

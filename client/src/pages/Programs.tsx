@@ -1,8 +1,8 @@
 import { useLoaderData } from "react-router-dom";
-import type { Course } from "../main";
+import type { Program } from "../main";
 
 export default function Programs() {
-  const programs = useLoaderData() as Course[];
+  const programs = useLoaderData() as Program[];
 
   return (
     <ul>
