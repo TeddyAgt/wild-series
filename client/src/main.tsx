@@ -2,6 +2,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
 /* ************************************************************************* */
 
 // Import the main app component
@@ -13,6 +14,7 @@ import Programs from "./pages/Programs";
 // import About from "./pages/About";
 // import Contact from "./pages/Contact";
 
+// Types
 export type Program = {
   id: number;
   title: string;
@@ -24,29 +26,32 @@ export type Program = {
 
 /* ************************************************************************* */
 
-// Create router configuration with routes
-// You can add more routes as you build out your app!
+// Loaders
+async function getPrograms(): Promise<Program[] | undefined> {
+  try {
+    const response = await fetch("http://localhost:3310/api/programs");
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    throw new Error("Couldn't retrieve data");
+  } catch (error) {
+    console.error(`Error while fetching data: ${error}`);
+  }
+}
+// Router
 const router = createBrowserRouter([
   {
     path: "/", // The root path
     element: <App />, // Renders the App component for the home page
-  },
-  {
-    path: "/programs",
-    element: <Programs />,
-    loader: async (): Promise<Program[] | undefined> => {
-      try {
-        const response = await fetch("http://localhost:3310/api/programs");
-
-        if (response.ok) {
-          const data = await response.json();
-          return data;
-        }
-        // throw new Error("Couldn't retrieve data");
-      } catch (error) {
-        console.error(`Error while fetching data: ${error}`);
-      }
-    },
+    children: [
+      {
+        path: "/programs",
+        element: <Programs />,
+        loader: getPrograms,
+      },
+    ],
   },
 ]);
 
