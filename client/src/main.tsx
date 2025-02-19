@@ -1,14 +1,18 @@
 // Import necessary modules from React and React Router
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import type { LoaderFunctionArgs } from "react-router-dom";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-
 /* ************************************************************************* */
 
 // Import the main app component
 import App from "./App";
 
 // Import additional components for new routes
+import ProgramDelete from "./pages/ProgramDelete";
+import ProgramDetails from "./pages/ProgramDetails";
+import ProgramEdit from "./pages/ProgramEdit";
+import ProgramNew from "./pages/ProgramNew";
 import Programs from "./pages/Programs";
 
 // import About from "./pages/About";
@@ -22,6 +26,7 @@ export type Program = {
   poster: string;
   country: string;
   year: number;
+  category_id: number;
 };
 
 /* ************************************************************************* */
@@ -40,6 +45,27 @@ async function getPrograms(): Promise<Program[] | undefined> {
     console.error(`Error while fetching data: ${error}`);
   }
 }
+
+async function getProgramById(
+  route: LoaderFunctionArgs,
+): Promise<Program | undefined> {
+  try {
+    const response = await fetch(
+      `http://localhost:3310/api/programs/${route.params.id}`,
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    }
+    throw new Error("Couldn't retrieve data");
+  } catch (error) {
+    console.error(`Error while fetching data: ${error}`);
+  }
+}
+
+/* ************************************************************************* */
+
 // Router
 const router = createBrowserRouter([
   {
@@ -50,6 +76,24 @@ const router = createBrowserRouter([
         path: "/programs",
         element: <Programs />,
         loader: getPrograms,
+      },
+      {
+        path: "/programs/:id",
+        element: <ProgramDetails />,
+        loader: getProgramById,
+      },
+      {
+        path: "/edit-program/:id",
+        element: <ProgramEdit />,
+        loader: getProgramById,
+      },
+      {
+        path: "/add-program",
+        element: <ProgramNew />,
+      },
+      {
+        path: "/delete-program",
+        element: <ProgramDelete />,
       },
     ],
   },
