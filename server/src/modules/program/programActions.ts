@@ -1,4 +1,4 @@
-import { log } from "node:console";
+import joi from "joi";
 import categoryRepository from "../category/categoryRepository";
 import type { Program } from "./programRepository";
 import programRepository from "./programRepository";
@@ -28,6 +28,26 @@ import programRepository from "./programRepository";
 
 // Declare the actions
 import type { RequestHandler } from "express";
+
+const programSchema = joi.object({
+  id: joi.number().integer().positive(),
+  title: joi.string().max(255).required(),
+  synopsis: joi.string().required(),
+  poster: joi.string().uri().required(),
+  country: joi.string().max(50).required(),
+  year: joi.number().integer().positive().required(),
+  category_id: joi.number().integer().positive().required(),
+});
+
+const validate: RequestHandler = (req, res, next) => {
+  const { error } = programSchema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    res.status(400).json({ validationErrors: error.details });
+  } else {
+    next();
+  }
+};
 
 const browse: RequestHandler = async (req, res) => {
   const programsFromDB = await programRepository.readAll();
@@ -93,4 +113,4 @@ const destroy: RequestHandler = async (req, res, next) => {
 
 // Export it to import it somewhere else
 
-export default { browse, read, edit, add, destroy };
+export default { browse, read, edit, add, destroy, validate };
